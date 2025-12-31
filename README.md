@@ -1,396 +1,461 @@
-# Price Reveal - Technical Valuation System
+# Price Reveal
 
-Professional software project analyzer with advanced valuation capabilities. Goes beyond simple cost estimation to provide technical value assessment based on infrastructure maturity, quality signals, and risk factors.
+**Technical Valuation System for Software Projects**
 
-## Features
+Version 5.0.0
 
-### Core Analysis
-- **Multi-language support**: Python, JavaScript, TypeScript, Java, C/C++, Go, Rust, and 15+ more
-- **Complexity-aware calculation**: Different languages weighted by complexity
-- **Flexible scope**: Analyze entire projects or specific folders
-- **File-level valuation**: Monetary value calculated per file with category-based multipliers
+---
 
-### Advanced Valuation Signals
+## What Is This?
 
-#### Infrastructure & History
-- **Git Integration**: Analyzes commit history, project age, contributors, and activity
-- **Historical Context**: Evaluates project evolution over time
+Price Reveal analyzes software projects and estimates their **technical development value** based on code quality, infrastructure maturity, and engineering practices.
 
-#### Quality & Testing
-- **Test Framework Detection**: Identifies pytest, Jest, JUnit, RSpec, and more
-- **Coverage Estimation**: Heuristic test coverage calculation
-- **Code Quality Signals**: Detects testing infrastructure and practices
+This is NOT a business valuation tool. It estimates what it would cost to rebuild the technical components from scratch, adjusted for quality signals.
 
-#### Architecture & Product
-- **API Detection**: Identifies REST, GraphQL, and gRPC implementations
-- **Frontend Frameworks**: Detects React, Vue, Angular, Svelte, Next.js
-- **Database Integration**: Finds PostgreSQL, MySQL, MongoDB, Redis, and others
-- **Docker Support**: Recognizes Dockerfile and docker-compose configurations
-
-#### DevOps & Collaboration
-- **CI/CD Detection**: Identifies GitHub Actions, GitLab CI, Jenkins, CircleCI
-- **Team Collaboration**: Estimates team size from Git contributors
-- **Branch Management**: Analyzes branching strategy
-
-#### Security & Risk
-- **Security Scanning**: Heuristic detection of potential security issues
-- **Risk Assessment**: Adjusts valuation based on detected risks
+---
 
 ## Installation
 
 ```bash
 chmod +x price_reveal.py
+sudo mv price_reveal.py /usr/local/bin/price_reveal
 ```
 
-### Requirements
-- Python 3.7+
-- Git (optional, for repository analysis)
-- No external dependencies
-
-## Usage
-
-### Basic Analysis
+Or run directly:
 
 ```bash
-./price_reveal.py /path/to/project
+python3 price_reveal.py /path/to/project
 ```
 
-### Interactive Folder Selection
+---
 
+## Quick Start
+
+**Analyze a project:**
 ```bash
-./price_reveal.py /path/to/project --select-folders
+price_reveal .
 ```
 
-Select specific folders to analyze:
-- Single folder: `1`
-- Multiple folders: `1,3,5`
-- Entire project: `0`
-
-### Configuration Mode
-
+**Select specific folders:**
 ```bash
-./price_reveal.py --config
+price_reveal --select .
 ```
 
-Allows you to:
-- Adjust hourly rates and productivity metrics
-- Configure valuation weights for each signal
-- Set file value multipliers
-- Enable/disable specific features
-- Save configuration persistently
-
-### Output Options
-
+**Configure analysis:**
 ```bash
-# Save to custom file
-./price_reveal.py /path/to/project --output report.json
-
-# Verbose mode
-./price_reveal.py /path/to/project --verbose
-
-# Hide file tree
-./price_reveal.py /path/to/project --no-tree
-
-# Disable colors
-./price_reveal.py /path/to/project --no-color
+price_reveal --config
 ```
 
-## Valuation Model
-
-### How Value is Calculated
-
-The system uses a multi-factor valuation model:
-
-```
-Estimated Technical Value = Base Cost × Maturity Multiplier × Risk Adjustment
+**Save report:**
+```bash
+price_reveal . --output report.json
 ```
 
-#### 1. Base Development Cost
-Calculated per file based on:
-- Lines of code
-- Language complexity weight
-- File category (entrypoint, core, test, config, documentation)
-- Hourly development rate
+---
 
-**File Categories:**
-- **Entrypoint** (2.5x): `main.py`, `index.js`, `app.py`, `server.js`
-- **Core** (2.0x): Files in `core/`, `engine/`, `kernel/` directories
-- **Test** (0.6x): Test and spec files
-- **Config** (0.4x): JSON, YAML, TOML files
-- **Documentation** (0.3x): Markdown, RST files
+## How It Works
 
-#### 2. Maturity Multiplier
-Increases value based on detected signals:
-
-| Signal | Weight | Trigger |
-|--------|--------|---------|
-| Git History | 1.3x | >1000 commits (scaled for fewer) |
-| Test Coverage | 1.25x | Tests detected (scaled by coverage %) |
-| Docker | 1.15x | Dockerfile present |
-| Database | 1.2x | DB integration detected |
-| API | 1.3x | REST/GraphQL/gRPC detected |
-| Frontend | 1.25x | Modern framework detected |
-| CI/CD | 1.15x | Automation configured |
-| Documentation | 1.1x | Good/excellent quality |
-| Team Collaboration | 1.2x | Multiple contributors |
-
-Multipliers compound for mature projects with multiple signals.
-
-#### 3. Risk Adjustment
-Reduces value based on detected issues:
-
-| Risk Factor | Impact | Trigger |
-|-------------|--------|---------|
-| Security Issues | 0.85x | >10 potential issues detected |
-| No Tests | 0.9x | No test framework found |
-| No README | 0.95x | No documentation |
-
-### Example Calculation
+### Base Calculation
 
 ```
-Project: E-commerce Platform
-Base Cost: $45,000
-Signals Detected:
-  - Git: 2,300 commits, 5 contributors → 1.3x
-  - Tests: 85% coverage → 1.22x
-  - Docker + Compose → 1.15x
-  - PostgreSQL → 1.2x
-  - REST API → 1.3x
-  - React Frontend → 1.25x
-  - GitHub Actions → 1.15x
-  - Excellent docs → 1.1x
-  - Team collaboration → 1.2x
-
-Maturity: 1.3 × 1.22 × 1.15 × 1.2 × 1.3 × 1.25 × 1.15 × 1.1 × 1.2 = 4.87x
-Risk: No major issues = 1.0x
-
-Technical Value: $45,000 × 4.87 × 1.0 = $219,150
+Base Cost = Lines of Code × Complexity Weight × (Hourly Rate / Lines per Hour)
 ```
+
+**Complexity weights** vary by language:
+- Rust, C++: 1.5x (complex)
+- Java, TypeScript: 1.2x (moderate)
+- Python, JavaScript: 1.0x (baseline)
+- HTML, CSS: 0.5x (simple)
+- Config files: 0.2-0.3x (minimal)
+
+**File category multipliers:**
+- Entrypoint files (main.py, index.js): 2.5x
+- Core business logic: 2.0x
+- Infrastructure: 1.5x
+- Tests: 0.6x
+- Config: 0.4x
+
+### Value Adjustments
+
+After calculating base cost, the system applies adjustments based on detected signals:
+
+**Positive Adjustments (Bonuses):**
+- Git History: +18% (if ≥10 commits)
+- Docker: +8%
+- CI/CD: +12%
+- Database: +15%
+- API: +20%
+
+**Negative Adjustments (Penalties):**
+- Missing Tests: -25%
+- Security Issues: -30%
+
+**Example:**
+```
+Base Cost:              $24,800
+Git History Bonus:     +18%  →  +$4,464
+Test Coverage Penalty: -25%  →  -$7,316
+Docker Bonus:          +8%   →  +$1,838
+────────────────────────────────────
+Final Technical Value:  $23,786
+```
+
+---
+
+## What Gets Valued
+
+### Included (Code Files)
+- Source code (.py, .js, .java, .rs, etc.)
+- Scripts (.sh, .bash)
+- SQL files
+- Configuration code (.yml, .json in src/)
+
+### Excluded (Assets)
+- Images, fonts, media files
+- Build artifacts (dist/, build/)
+- Dependencies (node_modules/, vendor/)
+- Binary files
+- Generated code
+
+**Asset files appear in reports with $0.00 value.**
+
+---
+
+## Detection Systems
+
+### Git Analysis
+Detects:
+- Total commits
+- Number of contributors
+- Project age (days)
+- Branch count
+- Commit frequency
+
+**Requirements:**
+- `.git/` directory present
+- At least 10 commits for bonus
+
+### Test Detection
+Detects:
+- pytest, jest, junit, rspec, mocha, xunit, go test
+- Test files (test/, spec/ patterns)
+- Test coverage ratio (test lines / code lines)
+
+**Penalty applied if:**
+- No test framework detected
+- Coverage ratio < 30%
+
+### Infrastructure
+Detects:
+- `Dockerfile`
+- `docker-compose.yml`
+- CI/CD configs (.github/workflows, .gitlab-ci.yml, etc.)
+
+### Database
+Detects in code:
+- PostgreSQL
+- MySQL
+- MongoDB
+- Redis
+- SQLite
+- Oracle
+- SQL Server
+
+### API
+Detects in code:
+- REST (Flask, FastAPI, Express, Gin)
+- GraphQL (Apollo, type Query)
+- gRPC (.proto files)
+- WebSocket
+
+### Security
+Detects issues:
+- Exposed .env files
+- Hardcoded passwords/API keys/tokens in code
+
+---
 
 ## Configuration System
 
-The configuration system allows full customization without editing code.
-
-### Access Configuration
-
+Access via:
 ```bash
-./price_reveal.py --config
+price_reveal --config
 ```
 
-### Configuration Options
+### Menu Options
 
-#### 1. Base Settings
-- Hourly rate (default: $50/hour)
-- Lines per hour productivity (default: 40)
+**1. Base Settings**
+- Hourly rate (default: $50)
+- Lines per hour (default: 40)
 
-#### 2. Valuation Weights
-Adjust impact of each signal:
-- `git_history_weight`: Default 1.3
-- `test_coverage_weight`: Default 1.25
-- `docker_weight`: Default 1.15
-- `database_weight`: Default 1.2
-- `api_weight`: Default 1.3
-- `frontend_weight`: Default 1.25
-- `ci_weight`: Default 1.15
-- `documentation_weight`: Default 1.1
-- `team_collaboration_weight`: Default 1.2
+**2. Enable/Disable Checks**
+Toggle analysis for:
+- Git
+- Tests
+- Docker
+- CI/CD
+- Security
+- Database
+- API
 
-#### 3. Risk Factors
-- `security_penalty`: Default 0.85
-- Applies when >10 security issues detected
+**3. Adjust Weights**
+Modify bonus/penalty percentages:
+- Git history: ±%
+- Test coverage: ±%
+- Docker: ±%
+- CI/CD: ±%
+- Database: ±%
+- API: ±%
+- Security: ±%
 
-#### 4. File Value Multipliers
-- `entrypoint_multiplier`: Default 2.5
-- `core_multiplier`: Default 2.0
-- `test_multiplier`: Default 0.6
-- `config_multiplier`: Default 0.4
-- `documentation_multiplier`: Default 0.3
+**4. File Category Multipliers**
+Adjust multipliers for:
+- Entrypoint (default: 2.5x)
+- Core (default: 2.0x)
+- Infrastructure (default: 1.5x)
+- Test (default: 0.6x)
+- Config (default: 0.4x)
 
-#### 5. Feature Toggles
-Enable/disable specific valuation signals:
-- `git_history_enabled`
-- `test_coverage_enabled`
-- `docker_enabled`
-- `database_enabled`
-- `api_enabled`
-- `frontend_enabled`
-- `ci_enabled`
-- `security_enabled`
-- `documentation_enabled`
-- `team_collaboration_enabled`
+**5. Reset to Defaults**
 
-### Configuration Storage
+**6. Save & Exit**
 
-Configuration is saved to `~/.pricereveal_config.json` and persists across sessions.
+Configuration saved to: `~/.pricereveal_config.json`
+
+---
+
+## Folder Selection
+
+Use `--select` to choose which directories to analyze:
+
+```bash
+price_reveal --select .
+```
+
+**Interface:**
+```
+Select directories to analyze:
+
+1. [x] src/
+2. [x] api/
+3. [ ] assets/
+4. [ ] dist/
+5. [x] tests/
+
+Commands:
+  a - Select all
+  n - Select none
+  <number> - Toggle directory
+  done - Continue with selection
+```
+
+This prevents asset directories, build folders, or irrelevant code from inflating the valuation.
+
+---
 
 ## Output Format
 
 ### Terminal Report
 
 Shows:
-- Project overview (files, lines, size)
-- Value calculation breakdown
-- All detected signals with details
-- Methodology explanation
-
-### File Tree with Values
-
-```
-src/
-├── api/
-│   ├── users.py          $1,240.00
-│   ├── auth.py           $2,180.00
-├── core/
-│   ├── engine.py         $4,960.00
-│   ├── processor.py      $3,420.00
-├── main.py               $2,050.00  (entrypoint)
-
-📂 Directory Values:
-  src/core: $8,380.00
-  src/api: $3,420.00
-  src/utils: $1,850.00
-```
+1. **Value Calculation** - Breakdown with adjustments
+2. **What Increased Value** - Detected positive signals
+3. **What Reduced Value** - Detected negative signals
+4. **What Was Ignored** - Asset files, builds
+5. **How This Was Calculated** - Methodology explanation
+6. **Known Limitations** - Honesty about accuracy
+7. **Top Value Files** - Highest-value code files
+8. **Top Value Directories** - Highest-value folders
 
 ### JSON Report
 
-Complete machine-readable output including:
-- All metrics and calculations
-- Full signal detection results
-- Per-file valuations
-- Directory-level aggregations
-- Value breakdown and methodology
+Saved automatically to: `pricereveal_<project>_<timestamp>.json`
 
-## Limitations
+Contains:
+- Metadata (project name, timestamp, version)
+- Summary (file counts, lines, hours)
+- Complete valuation breakdown
+- All detected metrics
+- Top 50 code files
+- Top 20 directories
+- Limitations list
 
-### What This Tool Does
-- Provides technical value estimation based on code analysis
-- Identifies infrastructure maturity signals
-- Assesses development investment
-- Highlights quality and risk factors
+---
 
-### What This Tool Does NOT Do
-- Financial or business valuation
-- Market value assessment
-- Revenue or profit estimation
-- Legal or accounting analysis
-- CVE-based vulnerability scanning
-- Actual code execution or testing
+## Command-Line Options
 
-### Important Notes
+```
+price_reveal [path] [options]
 
-**This is a heuristic model**: All calculations are estimates based on detectable patterns in code. The "value" represents accumulated technical investment and infrastructure maturity, not market value or business worth.
+Arguments:
+  path                  Project directory (default: interactive prompt)
 
-**Not a replacement for**: 
-- Professional software audits
-- Financial valuations
-- Security assessments
-- Code reviews
-
-**Best used for**:
-- Project scoping and estimation
-- Portfolio analysis
-- Technology stack assessment
-- Development investment tracking
-- Team productivity benchmarking
-
-## Detection Methods
-
-### Git Analysis
-- Uses `git` command-line interface
-- Analyzes commit history, contributors, branches
-- Requires Git repository to be present
-
-### Test Detection
-Searches for:
-- Test file naming patterns (`test_*.py`, `*.test.js`, `*_spec.rb`)
-- Test framework imports (pytest, jest, junit, rspec, etc.)
-- Test directories
-
-### Infrastructure Detection
-Checks for:
-- Configuration files (Dockerfile, docker-compose.yml)
-- CI/CD configs (.github/workflows, .gitlab-ci.yml, etc.)
-- Package managers and dependencies
-- Database clients in code
-
-### Security Scanning
-Heuristic pattern matching for:
-- Hardcoded credentials
-- Dangerous function usage (eval, exec)
-- Injection vulnerabilities patterns
-- XSS patterns in frontend code
-
-**Note**: This is NOT a comprehensive security audit. Use dedicated security tools for production systems.
-
-## Examples
-
-### Analyze Full Project
-```bash
-./price_reveal.py ~/projects/my-app
+Options:
+  --config              Open configuration menu
+  --select              Interactive folder selection
+  --output, -o FILE     Save JSON report to FILE
+  --no-tree             Hide file/directory tree
+  --no-color            Disable colored output
+  --version             Show version
+  -h, --help            Show help
 ```
 
-### Analyze Specific Folders
-```bash
-./price_reveal.py ~/projects/my-app --select-folders
-# Then select: 1,3,5 for src, api, and core folders
-```
-
-### Custom Configuration
-```bash
-./price_reveal.py --config
-# Set hourly rate to $100
-# Increase git_history_weight to 1.5
-# Save and exit
-
-./price_reveal.py ~/projects/my-app
-```
-
-### Generate Report
-```bash
-./price_reveal.py ~/projects/my-app --output valuation_report.json
-```
+---
 
 ## Methodology
 
-Price Reveal uses a research-informed approach combining:
+This tool uses a **heuristic model** inspired by software engineering economics research.
 
-1. **Industry Standards**: Typical development productivity metrics
-2. **Complexity Science**: Language-specific complexity weights
-3. **Infrastructure Patterns**: Common architectural signals
-4. **Quality Metrics**: Testing and documentation standards
-5. **Risk Assessment**: Security and maintenance indicators
+**Not machine learning.** Not real market data.
 
-The model is designed to be:
-- **Transparent**: All factors are visible and explainable
-- **Configurable**: Weights can be adjusted for your context
-- **Consistent**: Same inputs produce same outputs
-- **Conservative**: Prefers underestimation to overestimation
+The model combines:
+1. Development cost estimation (COCOMO-inspired)
+2. Infrastructure maturity signals
+3. Quality indicators
+4. Risk factors
 
-## Version History
+**Assumptions:**
+- Code complexity correlates with development time
+- Mature infrastructure indicates professional development
+- Tests indicate quality investment
+- Security issues indicate technical debt
 
-### 4.0.0 (Current)
-- Complete valuation system with maturity and risk factors
-- Per-file value calculation with category multipliers
-- Interactive configuration system
-- Folder selection capability
-- Git history analysis
-- Test coverage estimation
-- Infrastructure detection (Docker, databases, APIs)
-- Frontend framework detection
-- CI/CD platform detection
-- Security heuristics
-- Documentation quality assessment
-- Team collaboration signals
+**This is conservative by design.** When uncertain, the tool undervalues rather than overvalues.
 
-### 3.0.0
-- Basic cost estimation
-- Multi-language support
-- Complexity weights
+---
+
+## Known Limitations
+
+1. **No Git = Limited Maturity Assessment**
+   Without Git history, project age and collaboration can't be measured.
+
+2. **Heuristic Detection**
+   Test frameworks, databases, and APIs are detected via pattern matching, not static analysis.
+
+3. **Coverage Estimation**
+   Test coverage is estimated from line ratios, not actual coverage tools.
+
+4. **No Business Value**
+   Does NOT include:
+   - Revenue
+   - Market position
+   - Intellectual property value
+   - Brand value
+   - Customer base
+   - Contracts or partnerships
+
+5. **No Human Factors**
+   Does NOT include:
+   - Team experience
+   - Onboarding time
+   - Knowledge transfer costs
+   - Maintainability (beyond tests)
+
+6. **Language-Agnostic Complexity**
+   Complexity weights are rough approximations, not precise measurements.
+
+---
+
+## Use Cases
+
+### ✅ Good For
+
+- Internal cost estimation
+- Due diligence screening
+- Technical debt assessment
+- Comparing similar projects
+- Prioritizing refactoring
+- Demonstrating technical maturity
+
+### ❌ Not For
+
+- M&A valuations (use business valuation experts)
+- Investment decisions (technical value ≠ market value)
+- Pricing SaaS products (business model is separate)
+- Legal disputes (not expert testimony)
+
+---
+
+## Philosophy
+
+**Transparency over complexity.**
+
+This tool could use neural networks, complex ML models, or opaque formulas. It doesn't.
+
+Every adjustment is explainable. Every weight is configurable. Every calculation is auditable.
+
+**Conservative over optimistic.**
+
+When in doubt, undervalue. Better to be pleasantly surprised than disappointed.
+
+**Technical, not commercial.**
+
+This measures what was built, not what it's worth in the market.
+
+A brilliant technical solution for a dying market has high technical value but low commercial value.
+
+A mediocre technical solution for a thriving market has low technical value but high commercial value.
+
+This tool only measures the first.
+
+---
+
+## Contributing
+
+This is a commercial tool. For enterprise features, support, or customization:
+
+Contact: [Your contact information]
+
+---
 
 ## License
 
-This tool is provided as-is for project analysis purposes. Use professional services for financial decisions.
+Proprietary. For personal and internal business use only.
 
-## Support
+Redistribution, resale, or offering as a service requires written permission.
 
-For issues or questions, review the documentation or examine the source code. The tool is designed to be self-explanatory and configurable.
+---
+
+## Version History
+
+**5.0.0** - Complete rebuild
+- Folder selection system
+- Interactive configuration
+- Transparent valuation breakdown
+- Asset file handling ($0.00)
+- Professional report format
+- Conservative methodology
+
+**4.0.0** - Previous version (replaced)
+
+---
+
+## FAQ
+
+**Q: Why do my asset files show $0.00?**
+A: Assets (images, fonts, videos) aren't code. They don't require software engineering to create. Only code files are valued.
+
+**Q: Why is my value lower than expected?**
+A: The tool is conservative. Missing tests, no Git history, or security issues reduce value significantly. This is intentional.
+
+**Q: Can I adjust the weights?**
+A: Yes. Use `price_reveal --config` to customize all weights and multipliers.
+
+**Q: Why doesn't it detect my API/database?**
+A: Detection uses pattern matching. If your code doesn't match common patterns, it won't be detected. This is a known limitation.
+
+**Q: Is this legally defensible?**
+A: No. This is a heuristic tool for internal estimation. For legal or financial purposes, hire experts.
+
+**Q: What's the difference between this and business valuation?**
+A: This values the **technical implementation**. Business valuation includes revenue, market, IP, customers, etc. They're completely different.
+
+**Q: Can I use this for M&A?**
+A: Only as one input among many. Technical value is a small part of overall business value.
+
+**Q: Why not use ML?**
+A: Transparency. A neural network can't explain why it gave a particular value. This tool can explain every adjustment.
+
+---
+
+**Built for engineers who value honesty over hype.**
